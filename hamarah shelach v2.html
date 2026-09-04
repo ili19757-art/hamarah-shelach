@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="light only">
+<title>המראה שלך</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light only;
+    --bg: #F6F1EA;
+    --surface: #FFFDF9;
+    --ink: #2E2420;
+    --ink-soft: #7A6B62;
+    --accent: #5B3A4B;
+    --accent-warm: #B97A3D;
+    --line: #E4D9CC;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { background: var(--bg) !important; }
+  body {
+    font-family: 'Heebo', -apple-system, sans-serif; font-weight: 300;
+    max-width: 480px; margin: 0 auto; padding: 32px 22px 60px;
+    background: var(--bg) !important; color: var(--ink) !important; line-height: 1.65;
+  }
+  h1, h2, h3 { font-family: 'Frank Ruhl Libre', serif; font-weight: 500; }
+
+  .progress-wrap { height: 3px; background: var(--line); border-radius: 2px; margin-bottom: 26px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--accent-warm); border-radius: 2px; transition: width 0.35s ease; }
+  .progress-label { font-size: 12.5px; color: var(--ink-soft) !important; margin-bottom: 16px; background: var(--bg) !important; letter-spacing: 0.02em; }
+
+  .question { font-family: 'Frank Ruhl Libre', serif; font-size: 21px; line-height: 1.5; margin-bottom: 22px;
+              font-weight: 500; color: var(--ink) !important; background: var(--bg) !important; }
+
+  .option {
+    display: block; width: 100%; text-align: right; padding: 16px 18px; margin-bottom: 10px;
+    border: 1px solid var(--line); border-right: 3px solid var(--line); border-radius: 6px;
+    background: var(--surface) !important; color: var(--ink) !important;
+    font-family: 'Heebo', sans-serif; font-weight: 300; font-size: 15.5px; line-height: 1.5;
+    cursor: pointer; transition: border-right-color 0.15s ease, background 0.15s ease;
+  }
+  .option:active { background: #FBF7F1 !important; border-right-color: var(--accent-warm); }
+
+  textarea {
+    width: 100%; min-height: 110px; padding: 15px; border-radius: 6px; border: 1px solid var(--line);
+    font-size: 15.5px; font-family: 'Heebo', sans-serif; font-weight: 300; resize: vertical;
+    background: var(--surface) !important; color: var(--ink) !important; line-height: 1.6;
+  }
+  textarea:focus { outline: none; border-color: var(--accent-warm); }
+
+  .primary-btn {
+    display: block; width: 100%; padding: 17px; margin-top: 20px; border: none; border-radius: 6px;
+    background: var(--accent); color: #FBF6EF; font-family: 'Heebo', sans-serif;
+    font-size: 16.5px; font-weight: 500; cursor: pointer; letter-spacing: 0.01em;
+  }
+  .primary-btn:active { background: #4A2F3D; }
+
+  .secondary-btn {
+    display: block; width: 100%; padding: 14px; margin-top: 10px; border: 1px solid var(--line);
+    border-radius: 6px; background: transparent; color: var(--ink-soft) !important;
+    font-family: 'Heebo', sans-serif; font-size: 14.5px; font-weight: 300; cursor: pointer;
+  }
+
+  .start-screen { text-align: center; padding-top: 56px; position: relative; }
+  .start-screen::before {
+    content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(185,122,61,0.16) 0%, rgba(185,122,61,0) 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .start-screen > * { position: relative; z-index: 1; }
+  .title { font-size: 34px; margin-bottom: 14px; color: var(--ink) !important; background: transparent !important; }
+  .subtitle { color: var(--ink-soft) !important; font-size: 15.5px; background: transparent !important; line-height: 1.7; }
+
+  #err { color: #8B3A3A; font-size: 13.5px; margin-top: 8px; }
+
+  .processing { text-align: center; padding-top: 100px; }
+  .processing .subtitle { font-family: 'Frank Ruhl Libre', serif; font-size: 18px; color: var(--ink) !important; }
+  .processing .dots::after { content: ''; animation: dots 1.4s infinite; }
+  @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+  .report-section {
+    background: var(--surface); border-radius: 4px; padding: 20px 22px; margin-bottom: 14px;
+    border-right: 3px solid var(--accent);
+  }
+  .report-section h3 { margin: 0 0 10px; font-size: 20px; color: var(--ink) !important; background: var(--surface) !important; }
+  .report-section p { margin: 6px 0; font-size: 15px; color: var(--ink) !important; background: var(--surface) !important; line-height: 1.7; }
+  .report-section p strong { color: var(--accent) !important; font-weight: 500; }
+  .pattern-rank {
+    display: inline-block; font-size: 12.5px; color: var(--accent-warm) !important;
+    margin-bottom: 6px; background: var(--surface) !important; letter-spacing: 0.02em;
+  }
+
+  #debugPanel { margin-top: 30px; padding: 14px; background: #221A17; color: #8FBF8F; font-size: 11px;
+                border-radius: 6px; white-space: pre-wrap; direction: ltr; text-align: left; font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/**
+ * Standalone 17-question behavioral pattern scanner - scoring engine.
+ * Independent of Laser (Engine A/B) and V1.5.1. Pure function, no UI.
+ * JS port of engine.py - same PATTERN_ORDER, same QUESTION_MAP (corrected/
+ * rebalanced version, verified 4x each), same deterministic tie-break.
+ */
+
+// =============================================================================
+// "המראה שלך" — מפרט סופי. 17 דפוסים, שאלה אחת לכל דפוס, 4 דרגות-עוצמה (0-3).
+// הציון של כל דפוס הוא בדיוק הערך שנבחר בשאלה שלו. אין חישוב נוסף, אין
+// העברת-נקודות בין דפוסים, אין "פענוח" עצמאי — ביצוע מדויק של המפרט.
+// =============================================================================
+const PATTERN_ORDER = [
+  "p1_bitul_atzmi", "p2_mechika", "p3_pachad_netisha", "p4_dechiya", "p5_choser_emun",
+  "p6_pgia", "p7_achzava", "p8_pachad_kishalon", "p9_ashma", "p10_shlita",
+  "p11_choser_vadaut", "p12_maavak", "p13_sakana", "p14_hisradut",
+  "p15_hadchaka_rigshit", "p16_atzmaut_yeter", "p17_omes_gufani",
+];
+
+const PATTERN_NAME_HE = {
+  p1_bitul_atzmi: "ביטול עצמי",
+  p2_mechika: "מחיקה ושקיפות",
+  p3_pachad_netisha: "פחד מנטישה",
+  p4_dechiya: "דחייה",
+  p5_choser_emun: "חוסר אמון",
+  p6_pgia: "פגיעה ועלבון",
+  p7_achzava: "אכזבה",
+  p8_pachad_kishalon: "פחד מכישלון",
+  p9_ashma: "אשמה והלקאה עצמית",
+  p10_shlita: "שליטה",
+  p11_choser_vadaut: "חוסר ודאות",
+  p12_maavak: "מאבק",
+  p13_sakana: "סכנה",
+  p14_hisradut: "הישרדות",
+  p15_hadchaka_rigshit: "הדחקה רגשית",
+  p16_atzmaut_yeter: "עצמאות יתר / חוסר הישענות",
+  p17_omes_gufani: "עומס גופני",
+};
+
+// טבלת-תוכן מאושרת (גרסה מתוקנת) - כל שדה מבטא את הדפוס הספציפי בתחום
+// הזה, לא משפט-שלילי-כללי שמתאים לכמה דפוסים. אין לשנות ניסוח, לשפר
+// בשפה פסיכולוגית, או ליצור משפט-חופף בין דפוסים - לפי ההנחיה המפורשת.
+const PATTERN_CONTENT = {
+  p1_bitul_atzmi: { relationships:"מוותר/ת על מה שחשוב לך כדי לשמור על שקט בקשר", career:"לא מעלה רעיונות או בקשות, גם כשמגיע לך", livelihood:"מתקשה לבקש שכר או תנאים שמגיעים לך" },
+  p2_mechika: { relationships:"מרגיש/ה שהצרכים שלך לא ממש נראים", career:"התרומה שלך לא תמיד מקבלת הכרה", livelihood:"מתקשה לדרוש הכרה או תגמול על מה שאת/ה נותן/ת" },
+  p3_pachad_netisha: { relationships:"בודק/ת שוב ושוב שהקשר בסדר", career:"קשה לסמוך על יציבות במקום העבודה", livelihood:"חוסר ביטחון כלכלי שנשאר גם כשהמצב יציב" },
+  p4_dechiya: { relationships:"קשה לקבל קרבה או חום", career:"מתרחק/ת מהזדמנות דווקא כשהיא מתחילה להצליח", livelihood:"מתרחק/ת מהתקדמות כלכלית דווקא כשהיא מתקרבת" },
+  p5_choser_emun: { relationships:"בודק/ת שוב ושוב אם אפשר לסמוך על בן/בת הזוג", career:"קשה לסמוך על אנשים ולתת להם אחריות", livelihood:"בודק/ת שוב ושוב לפני החלטה כלכלית, גם כשיש מספיק מידע" },
+  p6_pgia: { relationships:"הערה קטנה יכולה להמשיך להעסיק אותך זמן רב", career:"ביקורת שגרתית יכולה להרגיש כמו התקפה אישית", livelihood:"הפסד או קושי כלכלי יכולים להמשיך להעסיק אותך זמן רב" },
+  p7_achzava: { relationships:"מצפה שהקשר ייראה אחרת ומתאכזב/ת כשזה לא קורה", career:"גם הישג טוב יכול להרגיש כמו \"לא מספיק\"", livelihood:"קשה להרגיש שהמצב הכלכלי באמת מספיק טוב" },
+  p8_pachad_kishalon: { relationships:"נמנע/ת מצעד בקשר מחשש שהוא לא יצליח", career:"דוחה משימות או הזדמנויות מחשש לא להצליח", livelihood:"נמנע/ת ממהלך כלכלי חדש מחשש להפסיד" },
+  p9_ashma: { relationships:"לוקח/ת אחריות גם על מה שלא בהכרח באשמתך", career:"מאשים/ה את עצמך גם כשלא הכול תלוי בך", livelihood:"מאשים/ה את עצמך על מצב שלא תמיד היה בשליטתך" },
+  p10_shlita: { relationships:"קשה לשחרר ולתת לדברים להתפתח מעצמם", career:"מתקשה להאציל משימות", livelihood:"מנסה לתכנן הכול כדי למנוע הפתעות" },
+  p11_choser_vadaut: { relationships:"קשה להתקדם בלי לדעת לאן הקשר הולך", career:"מתקשה להחליט בלי לדעת מה יקרה", livelihood:"מתקשה לקבל החלטה כלכלית בלי לדעת מה תהיה התוצאה" },
+  p12_maavak: { relationships:"מרגיש/ה שצריך להיאבק כדי לקבל קרבה או יחס", career:"מרגיש/ה שצריך להילחם כדי להתקדם ולהוכיח את עצמך", livelihood:"מרגיש/ה שכל התקדמות כלכלית דורשת מאבק" },
+  p13_sakana: { relationships:"קרבה גדולה יכולה להרגיש מאיימת", career:"הצלחה, חשיפה או ביקורת יכולות להרגיש מאיימות", livelihood:"גם מצב כלכלי תקין לא תמיד מרגיש בטוח" },
+  p14_hisradut: { relationships:"עסוק/ה בלשרוד את הקשר במקום לבנות אותו", career:"פועל/ת בעיקר כדי לעבור את היום", livelihood:"עסוק/ה בעיקר בכיבוי שרפות במקום בבנייה קדימה" },
+  p15_hadchaka_rigshit: { relationships:"מתקשה להישאר בשיחה כשעולים רגשות", career:"מעדיף/ה לפתור בעיה במקום לדבר על מה שמרגישים", livelihood:"מתמקד/ת במספרים ובפתרונות ומתקשה לעצור ולהכיר ברגש" },
+  p16_atzmaut_yeter: { relationships:"מתקשה לשתף בקושי ולבקש תמיכה", career:"עושה הכול לבד גם כשאפשר לקבל עזרה", livelihood:"נמנע/ת מלבקש עזרה גם כשאפשר לקבל אותה" },
+  p17_omes_gufani: { relationships:"ממשיך/ה לתפקד בקשר גם כשכבר אין לך כוחות", career:"ממשיך/ה לעבוד גם כשהגוף מאותת לעצור", livelihood:"ממשיך/ה לעבוד או להעמיס על עצמך גם כשהגוף מאותת לעצור" },
+};
+
+// כל שאלה שייכת לדפוס אחד בלבד. index (0/1/2/3) = הערך שנבחר לאותו דפוס.
+const QUESTION_TO_PATTERN = {
+  q1:"p1_bitul_atzmi", q2:"p2_mechika", q3:"p3_pachad_netisha", q4:"p4_dechiya",
+  q5:"p5_choser_emun", q6:"p6_pgia", q7:"p7_achzava", q8:"p8_pachad_kishalon",
+  q9:"p9_ashma", q10:"p10_shlita", q11:"p11_choser_vadaut", q12:"p12_maavak",
+  q13:"p13_sakana", q14:"p14_hisradut", q15:"p15_hadchaka_rigshit",
+  q16:"p16_atzmaut_yeter", q17:"p17_omes_gufani",
+};
+
+const QUESTION_IDS = Array.from({length:17}, (_,i)=>`q${i+1}`);
+
+function scoreEngine(answers){
+  if (Object.keys(answers).length !== 17) throw new Error(`Expected exactly 17 answers, got ${Object.keys(answers).length}`);
+  for (const qid of QUESTION_IDS){
+    if (!(qid in answers)) throw new Error(`Missing answer for ${qid}`);
+    const val = answers[qid];
+    if (![0,1,2,3].includes(val)) throw new Error(`Invalid answer '${val}' for ${qid} - must be 0,1,2,3`);
+  }
+  // כל ציון שייך אך ורק לדפוס של השאלה שלו. אין העברה, אין צבירה.
+  const scores = {};
+  for (const qid of QUESTION_IDS){
+    scores[QUESTION_TO_PATTERN[qid]] = answers[qid];
+  }
+  return { scores };
+}
+
+</script>
+<script>
+// ===========================================================================
+// GATEWAY LAYER - 4 open questions. Context only, never scored.
+// ===========================================================================
+const GATEWAY_Q = [
+  { id:'g1', text:'באיזה תחום בחיים היית הכי רוצה לראות שינוי עכשיו?' },
+  { id:'g2', text:'אם השינוי הזה יקרה, מה הדבר הראשון שייראה או ירגיש אחרת בחיים שלך?' },
+  { id:'g3', text:'מה הכי חסר לך היום כדי להגיע לשם?' },
+  { id:'g4', text:'כשאת/ה מנסה להתקדם לשם, מה בדרך כלל קורה?' },
+];
+
+// ===========================================================================
+// 17 CLOSED QUESTIONS - verbatim from the approved spec.
+// ===========================================================================
+const CLOSED_Q = [
+  { id:'q1', pattern:'p1_bitul_atzmi', text:'כשיש לי רצון או דעה ששונים מאלה של אדם קרוב:', opts:{
+    0:'אני מביע/ה את הרצון שלי כרגיל, גם אם קיימת אי-הסכמה.',
+    1:'לפעמים אני מתגמש/ת מעט כדי למנוע אי-נעימות רגעית.',
+    2:'לעיתים קרובות אני מוותר/ת על מה שרציתי כדי לא להיכנס לוויכוח.',
+    3:'אני כמעט תמיד מוותר/ת על הרצון שלי ומתאים/ה את עצמי לאחר, גם כשאני מאוד רוצה משהו אחר.'}},
+  { id:'q2', pattern:'p2_mechika', text:'כשאני נמצא/ת עם אנשים אחרים:', opts:{
+    0:'אני מרגיש/ה שנוכחותי מורגשת ושיש מקום למה שאני מביא/ה.',
+    1:'מדי פעם עולה בי תחושה שלא מספיק שמים לב אליי.',
+    2:'לעיתים קרובות אני מרגיש/ה שלא באמת שמים לב לנוכחות שלי ושאפשר בקלות להתעלם ממני.',
+    3:'אני מרגיש/ה שקוף/ה מול אחרים, כאילו הנוכחות שלי כמעט לא משנה ולא באמת מבחינים בי.'}},
+  { id:'q3', pattern:'p3_pachad_netisha', text:'כשאדם שקרוב אליי לוקח מרחק או ממעט בקשר:', opts:{
+    0:'אני מקבל/ת את המרחק בטבעיות, בלי לחשוש שהקשר נפגע.',
+    1:'לפעמים אני תוהה אם משהו השתנה, אך זה לא מעסיק אותי במיוחד.',
+    2:'לעיתים קרובות אני חושש/ת שהמרחק מעיד על התרחקות, ומתעורר בי צורך לוודא שהכל תקין.',
+    3:'מרחק קטן גורם לי לחשוש שהאדם עומד לעזוב אותי, ואני מתקשה להירגע עד שאני מקבל/ת סימן שהקשר בסדר.'}},
+  { id:'q4', pattern:'p4_dechiya', text:'כשמישהו מביע כלפיי חום, הערכה או רצון להתקרב אליי:', opts:{
+    0:'אני מקבל/ת את זה בטבעיות ובפתיחות.',
+    1:'לפעמים עולה בי מבוכה קלה, אך אני מאפשר/ת לזה להיות.',
+    2:'לעיתים קרובות אני מתקשה לקבל את החום ומנסה לצנן או להקטין אותו.',
+    3:'אני נוטה להדוף קרבה או חום, כי חלק בי מצפה שבסוף אפגע או אדחה.'}},
+  { id:'q5', pattern:'p5_choser_emun', text:'מול כוונות של אנשים בסביבה שלי:', opts:{
+    0:'ברירת המחדל שלי היא לסמוך על אנשים, אלא אם הוכח אחרת.',
+    1:'אני נוקט/ת בזהירות טבעית מול אנשים חדשים.',
+    2:'לעיתים קרובות אני חושד/ת שיש אינטרס נסתר מאחורי מילים או מעשים.',
+    3:'אני מניח/ה מראש שקשה לסמוך על אנשים, ולכן אני בודק/ת שוב ושוב את הכוונות שלהם לפני שאני נותן/ת אמון.'}},
+  { id:'q6', pattern:'p6_pgia', text:'כשמישהו אומר כלפיי אמירה לא רגישה או מעביר עליי ביקורת:', opts:{
+    0:'הדברים כמעט לא נוגעים בי, ואני ממשיך/ה הלאה בקלות.',
+    1:'אני נעלב/ת לרגע קצר, אך משחרר/ת את זה מהר.',
+    2:'הדברים פוגעים בי עמוק, ונשארת בי תחושת עלבון שמלווה אותי לאורך היום.',
+    3:'אני נוטה להיפגע עמוקות מכל הערה כזו, והכאב הפנימי ממשיך להעסיק אותי ימים ארוכים.'}},
+  { id:'q7', pattern:'p7_achzava', text:'כשאירוע או תוצאה אינם מתממשים כפי שציפיתי:', opts:{
+    0:'אני מקבל/ת את המציאות בגמישות ומתאים/ה את עצמי למצב החדש.',
+    1:'מופיעה תחושת החמצה קלה, אך אני מתאושש/ת ממנה ללא קושי.',
+    2:'תחושת האכזבה משמעותית וגוזלת ממני את החשק להמשיך או לנסות שוב באותו עניין.',
+    3:'אני חווה נפילת רוח קשה בכל פעם שדברים לא קורים כפי שקיוויתי, ומתקשה מאוד להתאושש מכך.'}},
+  { id:'q8', pattern:'p8_pachad_kishalon', text:'כשאני ניגש/ת למשימה או אתגר שיש בהם אפשרות לא להצליח:', opts:{
+    0:'אני פועל/ת מתוך ביטחון, ורואה באי-הצלחה חלק טבעי מהלמידה.',
+    1:'עולה בי חשש מסוים מתוצאה לא טובה, אך הוא אינו עוצר אותי מלהתקדם.',
+    2:'הפחד שלא אבצע את המשימה ברמה גבוהה מעכב אותי וגורם לי להסס רבות.',
+    3:'החשש מאי-הצלחה גורם לי להימנע מראש מביצוע, כדי לא לחוות תחושת כישלון.'}},
+  { id:'q9', pattern:'p9_ashma', text:'כשמשהו משתבש בסביבה שלי או מול אדם אחר:', opts:{
+    0:'אני בוחן/ת את המצב באופן ענייני ומפריד/ה בין מה שבאחריותי למה שלא.',
+    1:'לעיתים חולפת בי מחשבה שאולי יכולתי לפעול טוב יותר, אך היא חולפת.',
+    2:'לעיתים קרובות אני מניח/ה מיד שהטעות היא שלי ושוקע/ת בהאשמה עצמית.',
+    3:'אני נוטה לקחת על עצמי אשמה כמעט בכל שיבוש, ומייסר/ת את עצמי שוב ושוב על מה שקרה.'}},
+  { id:'q10', pattern:'p10_shlita', text:'כשדברים אינם מתנהלים בדיוק על פי התוכנית שהגדרתי:', opts:{
+    0:'אני מסתגל/ת לשינויים בקלות ומאפשר/ת לדברים לזרום כפי שהם.',
+    1:'לפעמים חוסר התאמה יוצר אצלי אי-נוחות קלה, אך אני משחרר/ת.',
+    2:'קשה לי לקבל שינויים, ואני פועל/ת כדי להחזיר את המצב למסלול שקבעתי מראש.',
+    3:'אני חש/ה צורך עז לשלוט בכל פרט ותרחיש, ומתקשה מאוד לתפקד ברוגע כשיש סטייה מהתוכנית.'}},
+  { id:'q11', pattern:'p11_choser_vadaut', text:'כשמצב מסוים אינו ברור ואין לי תמונה ודאית לגבי העתיד:', opts:{
+    0:'אני מסוגל/ת לקבל החלטות ולהתקדם גם בתוך אי-ודאות.',
+    1:'חוסר הבהירות יוצר אצלי היסוס קל, אך אינו עוצר אותי מלפעול.',
+    2:'לעיתים קרובות אי-הוודאות מעכבת אותי ומקשה עליי לקבל החלטות.',
+    3:'אני חש/ה שיתוק כמעט מלא ומתקשה לבצע צעד כלשהו כל עוד התמונה אינה ברורה לחלוטין.'}},
+  { id:'q12', pattern:'p12_maavak', text:'כשאני רוצה להשיג משהו שחשוב לי:', opts:{
+    0:'אני פועל/ת מתוך הבנה שדברים יכולים להגיע גם בפשטות ובזרימה.',
+    1:'לפעמים אני משקיע/ה מאמץ מיותר, אך לרוב מזהה מתי להרפות.',
+    2:'לעיתים קרובות אני מרגיש/ה שכדי להשיג תוצאה עליי להיאבק ולהתאמץ פי כמה.',
+    3:'אני פועל/ת מתוך תפיסה קבועה ששום דבר אינו מושג בקלות, ושכל דבר דורש מאבק ממושך.'}},
+  { id:'q13', pattern:'p13_sakana', text:'בהתנהלות היומיומית שלי:', opts:{
+    0:'אני מרגיש/ה מוגן/ת ובטוח/ה במרחב שלי ברוב הזמן.',
+    1:'מדי פעם עולה בי דריכות קלה, אך אני נרגע/ת ללא קושי.',
+    2:'לעיתים קרובות אני חש/ה דריכות פנימית וציפייה שמשהו שלילי עלול להתרחש.',
+    3:'אני נמצא/ת במצב קבוע של כוננות וסריקת איומים, מתוך תחושה שהסביבה אינה בטוחה.'}},
+  { id:'q14', pattern:'p14_hisradut', text:'כשיש עליי עומס ומשימות:', opts:{
+    0:'אני מצליח/ה לתכנן קדימה ולהקדיש זמן לצרכים אישיים גם בתקופות עמוסות.',
+    1:'בעומס נקודתי אני מתמקד/ת בהווה, אך חוזר/ת לתכנון ארוך טווח בהקדם.',
+    2:'לעיתים קרובות אני פועל/ת רק מתוך מטרה לעבור את היום הנוכחי, ללא פניות למבט קדימה.',
+    3:'אני מתנהל/ת במצב מתמיד של "כיבוי שרפות", וכל המיקוד שלי מושקע בהחזקת מעמד בלבד.'}},
+  { id:'q15', pattern:'p15_hadchaka_rigshit', text:'כשעולה בי רגש עז של כאב, עצב או סערה פנימית:', opts:{
+    0:'אני מאפשר/ת לעצמי לחוות את הרגש במלואו עד שהוא שוכך.',
+    1:'לפעמים אני מנסה לעבור מהר לעשייה, אך מאפשר/ת לעצמי לחוש.',
+    2:'לעיתים קרובות אני עובר/ת מיד לניתוח שכלי או פעולה טכנית כדי לא להרגיש את הכאב.',
+    3:'אני סוגר/ת את הרגש באופן אוטומטי, מנתק/ת את המגע עמו ומשדר/ת שליטה מלאה.'}},
+  { id:'q16', pattern:'p16_atzmaut_yeter', text:'כשאני ניצב/ת בפני קושי או עומס שבו עזרה חיצונית יכולה להקל:', opts:{
+    0:'אני פונה ומבקש/ת עזרה מאחרים בטבעיות ובקלות.',
+    1:'לפעמים אני מהסס/ת לפנות, אך בסופו של דבר נעזר/ת במידת הצורך.',
+    2:'לעיתים קרובות אני נמנע/ת מלבקש סיוע ומעדיף/ה להתמודד לבד כדי לא להכביד או להיראות חלש/ה.',
+    3:'אני נמנע/ת לחלוטין מלבקש עזרה, מתוך תפיסה נוקשה שעליי להסתדר לבד בכל מצב.'}},
+  { id:'q17', pattern:'p17_omes_gufani', text:'כשהגוף שלי מאותת לי על עייפות או כאב:', opts:{
+    0:'אני קשוב/ה לאיתותי הגוף, עוצר/ת לנוח ומאפשר/ת לעצמי התאוששות.',
+    1:'לעיתים אני מושך/ת מעט מעבר לצורך, אך עוצר/ת לפני שחיקה.',
+    2:'לעיתים קרובות אני מתעלם/ת מעייפות וממשיך/ה לדחוף קדימה למרות איתותי הגוף.',
+    3:'אני דוחף/ת קדימה באופן קבוע תוך התעלמות מוחלטת מסימני הגוף, עד לקריסה פיזית או השבתה.'}},
+];
+
+const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+const PHONE = '972524835507'; // 052-4835507 in international wa.me format
+
+function escapeHtml(str){
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+const SESSION_KEY = 'patterns17_session';
+const FLOW = ['start', ...GATEWAY_Q.map(q=>q.id), ...CLOSED_Q.map(q=>q.id), 'processing', 'final'];
+
+function loadSession(){
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (typeof p.step !== 'number' || typeof p.answers !== 'object') return null;
+    return p;
+  } catch(e){ return null; }
+}
+function saveSession(s){ try { localStorage.setItem(SESSION_KEY, JSON.stringify({step:s.step, answers:s.answers, perms:s.perms})); } catch(e){} }
+function clearSession(){ try { localStorage.removeItem(SESSION_KEY); } catch(e){} }
+
+
+let state = loadSession() || { step:0, answers:{}, perms:{} };
+let submitted = false;
+
+function render(){
+  const app = document.getElementById('app');
+  const id = FLOW[state.step];
+  if (id === 'start') return renderStart(app);
+  if (id === 'processing') return renderProcessing(app);
+  if (id === 'final') return renderFinal(app);
+  const gq = GATEWAY_Q.find(q=>q.id===id);
+  if (gq) return renderGateway(app, gq);
+  const cq = CLOSED_Q.find(q=>q.id===id);
+  if (cq) return renderClosed(app, cq);
+}
+
+function progressPct(){
+  const total = FLOW.length - 3; // exclude start/processing/final
+  const current = Math.max(0, Math.min(state.step, total));
+  return Math.round((current/total)*100);
+}
+function progressBar(){
+  return `<div class="progress-wrap"><div class="progress-bar" style="width:${progressPct()}%"></div></div>
+          <div class="progress-label">שאלה ${state.step} מתוך ${FLOW.length-2}</div>`;
+}
+
+function renderStart(app){
+  app.innerHTML = `
+    <div class="start-screen">
+      <h1 class="title">המראה שלך</h1>
+      <p class="subtitle" style="font-size:17px; margin-bottom:14px;">מה באמת מנהל את התגובות שלך?</p>
+      <p class="subtitle">סדרת שאלות קצרה שתעזור לזהות את דפוסי התגובה שחוזרים במצבים משמעותיים בחיים.</p>
+      <button class="primary-btn" id="startBtn">להתחיל</button>
+    </div>`;
+  document.getElementById('startBtn').onclick = () => { state.step=1; saveSession(state); render(); };
+}
+
+function renderGateway(app, q){
+  const existing = state.answers[q.id] || '';
+  app.innerHTML = `
+    ${progressBar()}
+    <div class="question">${q.text}</div>
+    <textarea id="gwInput" placeholder="אפשר לכתוב כמה מילים כאן...">${escapeHtml(existing)}</textarea>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:6px;">אפשר לכתוב כמה מילים. אין צורך לנסח בצורה מושלמת.</p>
+    <div id="err"></div>
+    <button class="primary-btn" id="nextBtn">הבא</button>`;
+  document.getElementById('nextBtn').onclick = () => {
+    const val = document.getElementById('gwInput').value.trim();
+    if (!val) { document.getElementById('err').textContent = 'צריך לכתוב משהו כדי להמשיך.'; return; }
+    state.answers[q.id] = val;
+    state.step += 1; saveSession(state); render();
+  };
+}
+
+function renderClosed(app, q){
+  // הערה טכנית: האפשרויות כאן הן סולם-עוצמה 0-3 (לא קטגוריות נפרדות) -
+  // לכן אין ערבוב-סדר, מוצג בדיוק בסדר 0→3 כפי שבמפרט. בחירה אוטומטית
+  // מובילה לשאלה הבאה - אין כפתור "הבא" נפרד.
+  app.innerHTML = `
+    ${progressBar()}
+    <div class="question">${q.text}</div>
+    ${[0,1,2,3].map(v=>`<button class="option" data-val="${v}">${q.opts[v]}</button>`).join('')}`;
+  app.querySelectorAll('.option').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      app.querySelectorAll('.option').forEach(b=>b.disabled=true);
+      const val = parseInt(btn.dataset.val,10);
+      state.answers[q.id] = val;
+      state.step += 1; saveSession(state); render();
+    });
+  });
+}
+
+function renderProcessing(app){
+  app.innerHTML = `<div class="processing"><p class="subtitle" style="margin-bottom:10px;">רגע אחד<span class="dots"></span></p><p class="subtitle">אני מסתכלת על התמונה שעולה מהתשובות שלך.</p></div>`;
+  setTimeout(() => { state.step += 1; saveSession(state); render(); }, 1300);
+}
+
+// כתובת-יעד לשליחת הדוח הפנימי (Formspree - שירות חינמי לאתרים סטטיים,
+// שולח נתוני-טופס ישירות למייל, בלי צורך בשרת). דורש הגדרה חד-פעמית:
+// 1) הרשמה חינמית ב-https://formspree.io עם המייל של נילי.
+// 2) יצירת טופס חדש שם, קבלת כתובת מהצורה https://formspree.io/f/XXXXXXXX
+// 3) החלפת המחרוזת למטה בכתובת האמיתית.
+// עד אז, השליחה נכשלת בשקט (fire-and-forget) והדוח עדיין נשמר מקומית
+// ומוצג ב-console/?debug=1 - לא נחסמת שום פעולה למשתמש/ת בגלל זה.
+const REPORT_DELIVERY_ENDPOINT = 'https://formspree.io/f/mbgjkdlb';
+
+function sendReportToNili(report){
+  if (!REPORT_DELIVERY_ENDPOINT || REPORT_DELIVERY_ENDPOINT.includes('YOUR_FORM_ID')) return;
+  try {
+    fetch(REPORT_DELIVERY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(report),
+      keepalive: true, // הבקשה שורדת גם אם הטאב/דפדפן נסגר מיד אחרי השליחה
+    }).catch(()=>{}); // best-effort - never blocks or crashes the UI on failure
+  } catch(e) {}
+}
+
+function renderFinal(app){
+  if (!submitted) {
+    submitted = true;
+
+    const closedAnswers = {};
+    for (const q of CLOSED_Q) closedAnswers[q.id] = state.answers[q.id];
+    const result = scoreEngine(closedAnswers);
+    const scores = result.scores; // {pattern_key: 0-3}, exactly per המפרט - ללא חישוב נוסף
+
+    const maxScore = Math.max(...PATTERN_ORDER.map(p => scores[p]));
+    const topPatterns = PATTERN_ORDER.filter(p => scores[p] === maxScore);
+
+    // דוח פנימי בלבד - לא מוצג למי שמילא/ה את השאלון בשום שלב.
+    const internalReport = {
+      generated_at: new Date().toISOString(),
+      timestamp: new Date().toISOString(),
+      gateway_answers: { g1: state.answers.g1, g2: state.answers.g2, g3: state.answers.g3, g4: state.answers.g4 },
+      closed_answers_raw: closedAnswers,
+      all_pattern_scores: Object.fromEntries(PATTERN_ORDER.map(p => [PATTERN_NAME_HE[p], scores[p]])),
+      pattern_names: PATTERN_ORDER.map(p => PATTERN_NAME_HE[p]),
+      top_patterns_by_score: topPatterns.map(p => ({ name: PATTERN_NAME_HE[p], score: maxScore })),
+      top_score: maxScore,
+      top_patterns_content_reference: topPatterns.map(p => ({ name: PATTERN_NAME_HE[p], ...PATTERN_CONTENT[p] })),
+    };
+    console.log('INTERNAL REPORT (never shown to the person who filled the questionnaire):', internalReport);
+    window.__internalReport = internalReport; // available for ?debug=1 inspection only
+    sendReportToNili(internalReport);
+
+    clearSession();
+  }
+
+  const phoneDisplay = '052-4835507';
+  const waMsg = encodeURIComponent(`היי נילי, סיימתי את "המראה שלך" והעברתי 197 ₪. מצורפת כאן אסמכתת התשלום.`);
+
+  app.innerHTML = `
+    <div class="start-screen" style="padding-top:20px;">
+      <h1 class="title" style="font-size:28px;">המפה שלך מוכנה</h1>
+      <p class="subtitle">עכשיו נשאר לעבור על התשובות ולחבר את התמונה האישית שעולה מהן.</p>
+      <div class="report-section" style="text-align:center; margin-top:22px;">
+        <p style="font-size:28px; font-weight:700; margin:6px 0; font-family:'Frank Ruhl Libre',serif;">197 ₪</p>
+        <p class="subtitle">תשלום ב-Bit או PayBox</p>
+        <p style="font-size:19px; font-weight:500; margin:14px 0 4px;">${phoneDisplay}</p>
+        <button class="secondary-btn" id="copyPhoneBtn">העתקת מספר הטלפון</button>
+        <div id="copyMsg" style="font-size:13px; color:#5B7A5B; margin-top:6px; height:16px;"></div>
+      </div>
+      <p class="subtitle" style="margin-top:18px;">לאחר ההעברה, יש לצלם או לשמור את אישור התשלום, ולשלוח אותו בוואטסאפ יחד עם ההודעה שנפתחת.</p>
+      <a class="primary-btn" style="text-decoration:none; display:block; text-align:center;"
+         href="https://wa.me/${PHONE}?text=${waMsg}" target="_blank">שליחת אסמכתא בוואטסאפ</a>
+      <p class="subtitle" style="margin-top:10px; font-size:13px;">הכפתור פותח וואטסאפ עם הודעה מוכנה. את צילום האסמכתא יש לצרף ידנית בתוך הצ'אט שנפתח.</p>
+      <p class="subtitle" style="margin-top:18px; font-size:14px;">לאחר קבלת האסמכתא, יתבצע מעבר אישי על התשובות ותשלח חזרה תגובה אישית למה שבלט.</p>
+    </div>
+    ${DEBUG ? '<div id="debugPanel"></div>' : ''}
+  `;
+  document.getElementById('copyPhoneBtn').onclick = () => {
+    const msgEl = document.getElementById('copyMsg');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(phoneDisplay).then(() => { msgEl.textContent = 'הועתק'; });
+    } else {
+      msgEl.textContent = phoneDisplay; // fallback: at least show it clearly
+    }
+  };
+  if (DEBUG && window.__internalReport) document.getElementById('debugPanel').textContent = JSON.stringify(window.__internalReport, null, 2);
+}
+
+render();
+</script>
+</body>
+</html>
